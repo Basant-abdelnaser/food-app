@@ -1,13 +1,13 @@
 "use client";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
-import { menuItems as initialItems } from "@/data/menu";
+import { useProductStore } from "@/store/productStore"; // ← changed
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
 
 export default function AdminProductsPage() {
   const { data: session } = useSession();
-  const [products, setProducts] = useState(initialItems);
+  const { products, addProduct, deleteProduct } = useProductStore(); // ← changed
   const [form, setForm] = useState({
     name: "",
     price: "",
@@ -23,26 +23,15 @@ export default function AdminProductsPage() {
     return null;
   }
 
-  const addProduct = () => {
+  const handleAdd = () => {
     if (!form.name || !form.price) return;
-    setProducts([
-      ...products,
-      {
-        ...form,
-        id: Date.now(),
-        nameAr: form.name,
-        price: parseFloat(form.price),
-      },
-    ]);
+    addProduct(form); // ← changed
     setForm({ name: "", price: "", category: "", image: "", description: "" });
   };
 
-  const deleteProduct = (id) =>
-    setProducts(products.filter((p) => p.id !== id));
-
   return (
     <div className="text-black">
-      <h1 className="text-2xl font-bold mb-6 ">{t("manageProducts")}</h1>
+      <h1 className="text-2xl font-bold mb-6">{t("manageProducts")}</h1>
       <div className="bg-white rounded-2xl p-6 shadow mb-6">
         <h2 className="font-bold mb-4">{t("addProduct")}</h2>
         <div className="grid grid-cols-2 gap-3">
@@ -59,7 +48,7 @@ export default function AdminProductsPage() {
           )}
         </div>
         <button
-          onClick={addProduct}
+          onClick={handleAdd}
           className="mt-4 bg-orange-500 text-white px-6 py-2 rounded-xl font-semibold hover:bg-orange-600 transition"
         >
           {t("addProduct")}
@@ -88,6 +77,8 @@ export default function AdminProductsPage() {
               onClick={() => deleteProduct(p.id)}
               className="text-red-400 hover:text-red-600 text-sm font-medium"
             >
+              {" "}
+              {/* ← changed */}
               {t("deleteProduct")}
             </button>
           </div>

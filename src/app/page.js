@@ -1,16 +1,19 @@
 "use client";
 import { useState } from "react";
-import { menuItems, categories } from "@/data/menu";
+import { useProductStore } from "@/store/productStore"; // ← changed
+import { categories } from "@/data/menu";
 import MenuCard from "@/components/MenuCard";
 import { useTranslation } from "react-i18next";
 
 export default function HomePage() {
   const [activeCategory, setActiveCategory] = useState("All");
+  const products = useProductStore((s) => s.products); // ← changed
   const { t } = useTranslation();
+
   const filtered =
     activeCategory === "All"
-      ? menuItems
-      : menuItems.filter((i) => i.category === activeCategory);
+      ? products
+      : products.filter((i) => i.category === activeCategory);
 
   return (
     <div>
